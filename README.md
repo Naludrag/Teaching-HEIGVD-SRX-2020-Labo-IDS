@@ -767,7 +767,9 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Reponse :**  
+Ce préprocesseur estutiisé pour décoder le traffic SSL et TLS. Comme ce processus est coûteux, il détermine également si et quand snort doit arrêter l'inspection.
+
+Généralement, seul le handshake SSL est inspecté puis une fois completé, l'inspection est arrêtée car le traffic est chiffré.
 
 ---
 
@@ -776,7 +778,7 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Reponse :**  
+Ce module détecte et filtre les informations sur les PII (données à caractère personnel). Il filtre donc les cartes de crédits, emails, adresses, etc.
 
 ---
 
