@@ -286,10 +286,10 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-Les proprocesseurs sont des plugins qui peuvent être utilisés afin d'examiner et de modifier des paquets avant l'engin de détection. Ceci permet de préparer les packets afin qu'ils soient correctement interprétés par cet engin de détection.  
-Dans le cas de paquet chiffrés cela peut être intéressant.
+Les proprocesseurs sont des plugins qui peuvent être utilisés afin d'examiner et de modifier des paquets avant l'engin de détection. Ceci permet de préparer les paquets afin qu'ils soient correctement interprétés par cet engin de détection.  
+Dans le cas de paquets chiffrés cela peut être intéressant.
 
-Il est également possible d'examiner un paquet pour ainsi détecter les paquets qui pourrait tenter de bypass la détection de snort.
+Certains preprocesseurs permettent également d'examiner un paquet pour ainsi détecter les paquets qui pourrait tenter de bypass la détection de snort.
 
 ---
 
@@ -329,7 +329,8 @@ sudo snort -c myrules.rules -i eth0
 
 ---
 
-`Running in IDS mode
+```
+Running in IDS mode
 
         --== Initializing Snort ==--
 Initializing Output Plugins!
@@ -338,7 +339,11 @@ Initializing Plug-ins!
 Parsing Rules file "myrules.rules"
 Tagged Packet Limit: 256
 Log directory = /var/log/snort
+```
+On voit tout d'abord l'initialisation de snort qui initialise Les plugins et les preprocesseurs. Les rules sont parsées et le chemin du dossier de log est affiché.
 
+
+```
 +++++++++++++++++++++++++++++++++++++++++++++++++++
 Initializing rule chains...
 1 Snort rules read
@@ -398,7 +403,10 @@ Acquiring network traffic from "eth0".
 Reload thread starting...
 Reload thread started, thread 0x7f0450de1700 (3326)
 Decoding Ethernet
+```
+Diverses informations sur les règles ainsi que la configuration.
 
+```
         --== Initialization Complete ==--
 
    ,,_     -*> Snort! <*-
@@ -411,7 +419,10 @@ Decoding Ethernet
            Using ZLIB version: 1.2.11
 
 Commencing packet processing (pid=3321)
-WARNING: No preprocessors configured for policy 0.`
+WARNING: No preprocessors configured for policy 0.
+```
+
+L'initialisation de snort est terminée et l'analyse des paquets commence.
 
 
 ---
@@ -432,7 +443,8 @@ Arrêter Snort avec `CTRL-C`.
 
 ---
 
-`===============================================================================
+```
+===============================================================================
 Run time for packet processing was 60.29478 seconds
 Snort processed 22993 packets.
 Snort ran for 0 days 0 hours 1 minutes 0 seconds
@@ -523,7 +535,11 @@ Verdicts:
       Retry:            0 (  0.000%)
 ===============================================================================
 Snort exiting
-`
+```
+
+Snort affiche un resumé de l'analyse lancé. On voit la durée, le nombre de paquets reçu (globalement et par protocole), ainsi que des statistiques sur les actions.
+
+Comme on voit ci-dessus, une alerte a été lancée lorsque nous avons visité le site.
 
 ---
 
@@ -534,7 +550,12 @@ Aller au répertoire /var/log/snort. Ouvrir le fichier `alert`. Vérifier qu'il 
 
 ---
 
-**Reponse :**  
+![](./images/Question7.PNG)
+
+La première ligne affiche le sid et la révision puis le message configuré de la règle.  
+La seconde ligne contient la catégorie (`classType`) qui permet de grouper les règles afin de mieux les organiser.  
+La troisième ligne est composée de la date et l'heure. On voit ensuite l'ip et le port source, la direction et l'ip et le port de destination.
+Les lignes restantes contiennent des informations sur le paquet TCP ayant déclenché l'alerte.
 
 ---
 
@@ -569,6 +590,8 @@ Ecrire une règle qui alerte à chaque fois que votre système reçoit un ping d
 
 `alert icmp any any -> 192.168.0.150 any (itype: 8; msg:"ICMP Detected"; sid:4000016; rev:1;)`
 
+Une alerte est généré lorsqu'un paquet icmp à destination 192.168.0.150 est détecté et que le itype vaut 8. Un itype de 8 correspond à une icmp-request.
+
 ---
 
 
@@ -578,7 +601,7 @@ Ecrire une règle qui alerte à chaque fois que votre système reçoit un ping d
 
 Nous avons mis l'opérateur de direction `->` pour indiquer que nous voulons tout le trafic arrivant vers notre station.   
 
-Nous avons également indiquer le paramètre itype: 8  qui permet de spécifier que nous désirons alerter que lors de echo request vers notre machine. Ainsi, si nous effectuons un ping depuis notre machine vers un autre système les echo reply ne seront pas alerté.
+Nous avons également indiquer le paramètre itype: 8  qui permet de spécifier que nous désirons alerter uniquement lors de echo request vers notre machine. Ainsi, si nous effectuons un ping depuis notre machine vers un autre système les echo reply ne déclencheront pas d'alerte.
 
 ---
 
@@ -587,7 +610,7 @@ Nous avons également indiquer le paramètre itype: 8  qui permet de spécifier 
 
 ---
 
-Le message est journaliser dans un fichier snort.log mais également dans le fichier alert.
+Le message est journaliser dans un fichier snort.log.xxxxxxxxxx ainsi que dans le fichier alert. Le fichier snort.log.xxxxxxxxxx (xxxxxxxxxx correspond au timestamp UNIX) est un PCAP des paquets de l'alerte.
 
 ---
 
@@ -597,11 +620,11 @@ Le message est journaliser dans un fichier snort.log mais également dans le fic
 ---
 
 Dans le fichier alert il est possible de voir les informations suivantes :
-![Paquet dans alert](images/Question12.png)
+![Paquet dans alert](images/Question12.PNG)
 
-Si nous desirons plus d'information sur les paquets que nous avons detecter il est possible d'aller voir dans le fichier de log dans ce cas nous pouvons voir les informations ci-dessous :
+Si nous désirons plus d'information sur les paquets que nous avons detecter il est possible d'aller voir dans le fichier de log dans ce cas nous pouvons voir les informations ci-dessous :
 
-![Paquet Wireshark ping](images/Question12_Wire.png)
+![Paquet Wireshark ping](images/Question12_Wire.PNG)
 
 ---
 
@@ -618,13 +641,12 @@ Modifier votre règle pour que les pings soient détectés dans les deux sens.
 Si nous voulons voir seulement les echo request il suffit de modifier l'opérateur de direction `->` par `<>` pour être bidirectionnel.  
 `alert icmp any any <> 192.168.0.150 any (itype: 8; msg:"ICMP Detected"; sid:4000016; rev:1;)`
 
-![Paquet Wireshark ping](images/Question13.png)
+![Paquet Wireshark ping](images/Question13.PNG)
 
-Dans le capture ci-dessus il est possible de constater que l'on voit de ping envoyer depuis notre station `192.168.0.150` vers un autre système ainsi que les ping reçu par notre machine par d'autre système.
+Dans la capture ci-dessus il est possible de constater que l'on voit les pings envoyés depuis notre station `192.168.0.150` vers un autre système. On détecte également les pings d'autres machines à destination de la nôtre.
 
 Si nous voulons également voir les echo reply il faut enlever le itype: 8 de la règle.  
-`alert icmp any any <> 192.168.0.150 any (msg:"ICMP Detected"; sid:4000016; rev:1;)
-`
+`alert icmp any any <> 192.168.0.150 any (msg:"ICMP Detected"; sid:4000016; rev:1;)`
 
 ---
 
