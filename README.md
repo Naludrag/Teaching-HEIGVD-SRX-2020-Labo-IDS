@@ -286,8 +286,9 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-Les proprocesseurs sont des plugins qui peuvent être utilisés afin d'examiner et de modifier des paquets avant l'engin de détection. Ceci permet de préparer les paquets afin qu'ils soient correctement interprétés par cet engin de détection.  
-Dans le cas de paquets chiffrés cela peut être intéressant.
+Les proprocesseurs sont des plugins qui peuvent être utilisés afin d'examiner et de modifier des paquets avant l'engin de détection, l'IDS dans notre cas. Ceci permet de préparer les paquets afin qu'ils soient correctement interprétés par l'engin de détection.
+
+Dans le cas de paquets chiffrés cela peut être intéressant. Nous pourrions déchiffrer le paquet avant de le transmettre à l'IDS par exemple.
 
 Certains preprocesseurs permettent également d'examiner un paquet pour ainsi détecter les paquets qui pourrait tenter de bypass la détection de snort.
 
@@ -297,7 +298,7 @@ Certains preprocesseurs permettent également d'examiner un paquet pour ainsi d�
 
 ---
 
-Parce que nous n'avons pas configuré de plugin préprocesseur pour le snort.
+Parce que nous n'avons pas configuré de plugin préprocesseur pour le snort dans note fichier "home-made".
 
 ---
 
@@ -313,9 +314,9 @@ alert tcp any any -> any any (msg:"Mon nom!"; content:"Rubinstein"; sid:4000015;
 
 ---
 
-Cette règle va prendre tout les paquets tcp venant de n'importe quelle IP de n'importe quel port vers n'importe quelle IP et port.
+Cette règle va prendre tout les paquets tcp venant de n'importe quelle IP de n'importe quel port vers(`->`) n'importe quelle IP et port(règle mono-directionnelle).
 
-Elle va lancer une alerte avec le message "mon nom!" (`msg:"Mon nom!";`) lorsque le paquet contient le mot-clé Rubinstein (`content:"Rubinstein";`). La règle a pour id unique 4000015 ce qui nous montre que c'est une règle rajouter par l'utilisateur qui dans sa version 1.
+Elle va lancer une alerte avec le message "mon nom!" (`msg:"Mon nom!";`) lorsque le paquet contient le mot-clé Rubinstein (`content:"Rubinstein";`). La règle a pour id unique 4000015 ce qui nous montre que c'est une règle rajouter par l'utilisateur qui dans sa version 1. Nous pouvons affirmer cela les 1'000'000 premières règles sont réserver aux règles de base de Snort.
 
 ---
 
@@ -340,7 +341,7 @@ Parsing Rules file "myrules.rules"
 Tagged Packet Limit: 256
 Log directory = /var/log/snort
 ```
-On voit tout d'abord l'initialisation de snort qui initialise Les plugins et les preprocesseurs. Les rules sont parsées et le chemin du dossier de log est affiché.
+On voit tout d'abord l'initialisation de Snort qui initialise Les plugins et les preprocesseurs. Les rules sont parsées et le chemin du dossier de log est affiché.
 
 
 ```
@@ -404,7 +405,7 @@ Reload thread starting...
 Reload thread started, thread 0x7f0450de1700 (3326)
 Decoding Ethernet
 ```
-Diverses informations sur les règles ainsi que la configuration.
+On voit ensuite diverses informations sur les règles ainsi que la configuration.
 
 ```
         --== Initialization Complete ==--
@@ -421,11 +422,8 @@ Diverses informations sur les règles ainsi que la configuration.
 Commencing packet processing (pid=3321)
 WARNING: No preprocessors configured for policy 0.
 ```
-<<<<<<< HEAD
-=======
 
 L'initialisation de snort est terminée et l'analyse des paquets commence.
->>>>>>> ef4563f307a5d0f1c4adf186a8503868da254c7e
 
 
 ---
@@ -436,7 +434,7 @@ Aller à un site web contenant dans son text votre nom ou votre mot clé que vou
 
 ---
 
-**Reponse :**  
+Le terminal n'affiche rien de spécial il continue son exécution.
 
 ---
 
@@ -539,13 +537,14 @@ Verdicts:
 ===============================================================================
 Snort exiting
 ```
-<<<<<<< HEAD
-=======
+Snort affiche un resumé de l'analyse lancé.
 
-Snort affiche un resumé de l'analyse lancé. On voit la durée, le nombre de paquets reçu (globalement et par protocole), ainsi que des statistiques sur les actions.
+Dans la première partie, il est possible de voir pendant combien de temps Snort c'est exécuté.
+Ensuite, les statistiques sur la mémoires utilisers par snort est affichés.
 
-Comme on voit ci-dessus, une alerte a été lancée lorsque nous avons visité le site.
->>>>>>> ef4563f307a5d0f1c4adf186a8503868da254c7e
+Puis, on peut voir le nombre de paquet que nous avons reçu et ceux analyser par Snort. Nous avons juste après le nombre de paquet analysés par protocol(protocol: nombre de paquets) ainsi que des statistiques sur les actions.
+
+La dernière partie nous renseigne sur les alertes et les logs dans notre cas on peut voir une alerte lancée lorsque nous avons visité le site.
 
 ---
 
@@ -576,11 +575,16 @@ Ecrire une règle qui journalise (sans alerter) un message à chaque fois que Wi
 
 ---
 
-Notre règle est `log tcp 192.168.0.150 any -> 91.198.174.192 [80,443]`. L'adresse source indiquer est l'adresse de la station que nous avons utilisé et l'adresse `91.198.174.192` est l'adresse que nous avons obtenu en effectuant un nslookup de www.wikipedia.org. Nous avons ensuite logger tout ce qui a pour destination le port 80 et 443.
+Notre règle est `log tcp 192.168.0.150 any -> 91.198.174.192 [80,443]`.
 
-Les messages ont été journalisés dans un fichier se nommant snort.log.1585580127 dans le dossier `/var/log/snort`.
+L'adresse source indiquer est l'adresse de la station que nous avons utilisé.  
+L'adresse `91.198.174.192` est l'adresse que nous avons obtenu en effectuant un nslookup de www.wikipedia.org. Nous avons ensuite logger tout ce qui a pour destination le port 80 et 443(http et https).
+
+Les messages ont été journalisés dans un fichier se nommant snort.log.XXXXXXXXXX dans le dossier `/var/log/snort`.
 
 Ce qui a été journalisé c'est la communication du client avec le serveur wikipedia. Il est possible de voir le client qui s'annonce au serveur ainsi que le client qui envoie ses clés aux serveurs etc..
+
+#TODO Capture WIRESHARK
 
 ---
 
@@ -596,7 +600,7 @@ Ecrire une règle qui alerte à chaque fois que votre système reçoit un ping d
 
 `alert icmp any any -> 192.168.0.150 any (itype: 8; msg:"ICMP Detected"; sid:4000016; rev:1;)`
 
-Une alerte est généré lorsqu'un paquet icmp à destination 192.168.0.150 est détecté et que le itype vaut 8. Un itype de 8 correspond à une icmp-request.
+Une alerte est généré lorsqu'un paquet icmp à destination `192.168.0.150`(machine hôte) est détecté et que le itype vaut 8. Un itype de 8 correspond à une icmp-request.
 
 ---
 
@@ -607,7 +611,7 @@ Une alerte est généré lorsqu'un paquet icmp à destination 192.168.0.150 est 
 
 Nous avons mis l'opérateur de direction `->` pour indiquer que nous voulons tout le trafic arrivant vers notre station.   
 
-Nous avons également indiquer le paramètre itype: 8  qui permet de spécifier que nous désirons alerter uniquement lors de echo request vers notre machine. Ainsi, si nous effectuons un ping depuis notre machine vers un autre système les echo reply ne déclencheront pas d'alerte.
+Nous avons également indiquer le paramètre itype: 8  qui permet de spécifier que nous désirons alerter uniquement lors de echo request vers notre machine. Ainsi, si nous effectuons un ping depuis notre machine vers un autre système les echo reply que notre machine générera ne déclencheront pas d'alerte.
 
 ---
 
@@ -616,7 +620,7 @@ Nous avons également indiquer le paramètre itype: 8  qui permet de spécifier 
 
 ---
 
-Le message est journaliser dans un fichier snort.log.xxxxxxxxxx ainsi que dans le fichier alert. Le fichier snort.log.xxxxxxxxxx (xxxxxxxxxx correspond au timestamp UNIX) est un PCAP des paquets de l'alerte.
+Le message est journaliser dans un fichier snort.log.XXXXXXXXXX ainsi que dans le fichier alert. Le fichier snort.log.XXXXXXXXXX (XXXXXXXXXX correspond au timestamp UNIX) est un PCAP des paquets de l'alerte. Il peut donc être lu par Wireshark
 
 ---
 
@@ -628,9 +632,13 @@ Le message est journaliser dans un fichier snort.log.xxxxxxxxxx ainsi que dans l
 Dans le fichier alert il est possible de voir les informations suivantes :
 ![Paquet dans alert](images/Question12.PNG)
 
+On voit alors les 4 ECHO que notre machine à reçu.
+
 Si nous désirons plus d'information sur les paquets que nous avons detecter il est possible d'aller voir dans le fichier de log dans ce cas nous pouvons voir les informations ci-dessous :
 
 ![Paquet Wireshark ping](images/Question12_Wire.PNG)
+
+Grâce à cela il est possible de constater que les paquets reçu sont bien des echo-request.
 
 ---
 
@@ -652,6 +660,7 @@ Si nous voulons voir seulement les echo request il suffit de modifier l'opérate
 Dans la capture ci-dessus il est possible de constater que l'on voit les pings envoyés depuis notre station `192.168.0.150` vers un autre système. On détecte également les pings d'autres machines à destination de la nôtre.
 
 Si nous voulons également voir les echo reply il faut enlever le itype: 8 de la règle.  
+Ce qui donnerai la règle suivante :   
 `alert icmp any any <> 192.168.0.150 any (msg:"ICMP Detected"; sid:4000016; rev:1;)`
 
 ---
@@ -666,10 +675,24 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 **Question 14: Quelle est votre règle ? Montrer la règle et expliquer en détail comment elle fonctionne.**
 
 ---
-
+Voici la règle que nous avons définie :  
 `alert tcp any any -> 192.168.0.199 22 (msg:"SSH connection detected"; content:"SSH-"; nocase; sid:4000017; rev:1;)`
 
+Voici la décomposition de la commande :
 
+Si notre machine hôte(`192.168.0.199`) reçoit un paquet TCP sur le port 22 de n'importe quel machine(any any) contenant dans son paquet le mot clé "SSH-", un message d'alerte "SSH connection detetected" est enregistré par Snort.
+
+L'attribut nocase permet de définir que le mot-clé peut-être trouver en miniscule ou majuscule. Nous avons également défini un sid et un numéro de révision.
+
+Nous avons défini le mot-clé "SSH-" après avoir fais certaines recherches. Voici notre démarche :
+
+ Nous avons tenté une connexion ssh sur la machine hôte tout en capturant le traffic avec Wireshark.  
+ Nous avons ensuite effectué une recherche des paquets TCP sur le port 22.  
+ Puis, nous avons regarder le stream TCP et avons obtenu le résultat suivant :
+
+![Paquet Wireshark ping](images/Question14.PNG)
+
+Nous avons alors remarqué que le paquet SSH- était le premier paquet du stream donc le premier paquet reçu lors d'une tentative d'établissement de connexion SSH.
 
 ---
 
@@ -678,7 +701,9 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 ---
 
-**Reponse :**  
+![Paquet Wireshark ping](images/Question14_alert.PNG)
+
+Comme espéré, nous avons bien les 2 messages d'alerts qui représente les 2 premiers messages d'une connexion SSH(voir image Wireshark Question 14).
 
 ---
 
@@ -692,8 +717,13 @@ Lancer Wireshark et faire une capture du trafic sur l'interface connectée au br
 
 ---
 
-snort -c myrules.rules -r ./Documents/captureQuestion16.pcapng
+`snort -c myrules.rules -r ./Documents/captureQuestion16.pcapng`
 
+Voici le résultat final au niveau des alertes après la lecture du fichier.
+
+![Paquet Wireshark ping](images/Question16.PNG)
+
+On voit 8 alertes car lors de la capture nous avons effectués 2 ping en direction de la machine hôte.
 
 
 ---
@@ -704,7 +734,9 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-Le comportement reste identique sauf que au lieu d'écouter le tarffic il lit le fichier. Le fichier alert est modifié si des alertes sont détectées et le fichier de log snort est également créer après la lecture.
+Le comportement reste identique sauf que à la place d'écouter le trafic il lit le fichier. Le fichier alert est modifié si des alertes sont détectées et le fichier de log snort est également créer après la lecture.
+
+La seul différence pourrait finir du fait que Snort s'arrête après la lecture du fichier alors que dans le mode temps réel nous devons le désactiver à la main
 
 ---
 
@@ -713,6 +745,9 @@ Le comportement reste identique sauf que au lieu d'écouter le tarffic il lit le
 ---
 
 Oui comme il est possible de le voir ci-dessous avec la capture d'écran.
+![Paquet Wireshark ping](images/Question18.PNG)
+
+Nous avons effectué 2 ping en direction de la machine hôte et on voit donc les 8 echo-request que la machine a reçue.
 
 ---
 
@@ -777,7 +812,7 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-Ce préprocesseur estutiisé pour décoder le traffic SSL et TLS. Comme ce processus est coûteux, il détermine également si et quand snort doit arrêter l'inspection.
+Ce préprocesseur est utiisé pour décoder le traffic SSL et TLS. Comme ce processus est coûteux, il détermine également si et quand snort doit arrêter l'inspection.
 
 Généralement, seul le handshake SSL est inspecté puis une fois completé, l'inspection est arrêtée car le traffic est chiffré.
 
