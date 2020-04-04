@@ -329,7 +329,8 @@ sudo snort -c myrules.rules -i eth0
 
 ---
 
-`Running in IDS mode
+```
+Running in IDS mode
 
         --== Initializing Snort ==--
 Initializing Output Plugins!
@@ -411,7 +412,8 @@ Decoding Ethernet
            Using ZLIB version: 1.2.11
 
 Commencing packet processing (pid=3321)
-WARNING: No preprocessors configured for policy 0.`
+WARNING: No preprocessors configured for policy 0.
+```
 
 
 ---
@@ -432,7 +434,8 @@ Arrêter Snort avec `CTRL-C`.
 
 ---
 
-`===============================================================================
+```
+===============================================================================
 Run time for packet processing was 60.29478 seconds
 Snort processed 22993 packets.
 Snort ran for 0 days 0 hours 1 minutes 0 seconds
@@ -523,7 +526,7 @@ Verdicts:
       Retry:            0 (  0.000%)
 ===============================================================================
 Snort exiting
-`
+```
 
 ---
 
@@ -597,11 +600,11 @@ Le message est journaliser dans un fichier snort.log mais également dans le fic
 ---
 
 Dans le fichier alert il est possible de voir les informations suivantes :
-![Paquet dans alert](images/Question12.png)
+![Paquet dans alert](images/Question12.PNG)
 
 Si nous desirons plus d'information sur les paquets que nous avons detecter il est possible d'aller voir dans le fichier de log dans ce cas nous pouvons voir les informations ci-dessous :
 
-![Paquet Wireshark ping](images/Question12_Wire.png)
+![Paquet Wireshark ping](images/Question12_Wire.PNG)
 
 ---
 
@@ -618,7 +621,7 @@ Modifier votre règle pour que les pings soient détectés dans les deux sens.
 Si nous voulons voir seulement les echo request il suffit de modifier l'opérateur de direction `->` par `<>` pour être bidirectionnel.  
 `alert icmp any any <> 192.168.0.150 any (itype: 8; msg:"ICMP Detected"; sid:4000016; rev:1;)`
 
-![Paquet Wireshark ping](images/Question13.png)
+![Paquet Wireshark ping](images/Question13.PNG)
 
 Dans le capture ci-dessus il est possible de constater que l'on voit de ping envoyer depuis notre station `192.168.0.150` vers un autre système ainsi que les ping reçu par notre machine par d'autre système.
 
@@ -639,7 +642,9 @@ Essayer d'écrire une règle qui Alerte qu'une tentative de session SSH a été 
 
 ---
 
-**Reponse :**  
+`alert tcp any any -> 192.168.0.199 22 (msg:"SSH connection detected"; content:"SSH-"; nocase; sid:4000017; rev:1;)`
+
+
 
 ---
 
@@ -662,7 +667,9 @@ Lancer Wireshark et faire une capture du trafic sur l'interface connectée au br
 
 ---
 
-**Reponse :**  
+snort -c myrules.rules -r ./Documents/captureQuestion16.pcapng
+
+
 
 ---
 
@@ -672,7 +679,7 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-**Reponse :**  
+Le comportement reste identique sauf que au lieu d'écouter le tarffic il lit le fichier. Le fichier alert est modifié si des alertes sont détectées et le fichier de log snort est également créer après la lecture.
 
 ---
 
@@ -680,7 +687,7 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 ---
 
-**Reponse :**  
+Oui comme il est possible de le voir ci-dessous avec la capture d'écran.
 
 ---
 
@@ -694,7 +701,7 @@ Faire des recherches à propos des outils `fragroute` et `fragtest`.
 
 ---
 
-**Reponse :**  
+fragroute
 
 ---
 
