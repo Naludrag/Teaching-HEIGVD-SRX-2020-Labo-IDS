@@ -286,7 +286,7 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-Les préprocesseurs sont des plugins qui peuvent être utilisés afin d'examiner et de modifier des paquets avant l'engin de détection, l'IDS dans notre cas. Ceci permet de préparer les paquets afin qu'ils soient correctement interprétés par l'engin de détection.
+Les proprocesseurs sont des plugins qui peuvent être utilisés afin d'examiner et de modifier des paquets avant l'engin de détection, l'IDS dans notre cas. Ceci permet de préparer les paquets afin qu'ils soient correctement interprétés par l'engin de détection.
 
 Dans le cas de paquets chiffrés cela peut être intéressant. Nous pourrions déchiffrer le paquet avant de le transmettre à l'IDS par exemple.
 
@@ -584,7 +584,7 @@ Les messages ont été journalisés dans un fichier se nommant snort.log.XXXXXXX
 
 Ce qui a été journalisé c'est la communication du client avec le serveur wikipedia. Il est possible de voir le client qui s'annonce au serveur ainsi que le client qui envoie ses clés aux serveurs etc..
 
-#TODO Capture WIRESHARK
+![Qireshark Wikipedia](images/Question8.PNG)
 
 ---
 
@@ -761,9 +761,7 @@ Faire des recherches à propos des outils `fragroute` et `fragtest`.
 
 ---
 
-Ces deux outils sont utilisés modifier le traffic sortant dans le but d'évader la détection d'un NIDS. Ces outils sont uniquement capables de modifier le traffic sortant à destination d'un NIDS.
-
-D'autres outils, tel que fragrouter, permettent de travailler sur tout le traffic réseau en utilisant du forwarding.
+fragroute
 
 ---
 
@@ -772,10 +770,7 @@ D'autres outils, tel que fragrouter, permettent de travailler sur tout le traffi
 
 ---
 
-Ces outils travaillent principalement en fragmentant les paquets. Ils sont ensuite capables de dupliquer, dropper, réordonner les segments.  
-Une autre technique abuse également le réassemblage de fragments (fragmentation overlap). Cela consiste à remplacer certains fragments par les plus récents ou les plus anciens lors du réassemblage.
-
-Ces différentes techniques peuvent être utilisées pour évader la détéction.
+**Reponse :**  
 
 ---
 
@@ -784,6 +779,7 @@ Ces différentes techniques peuvent être utilisées pour évader la détéction
 
 ---
 
+**Reponse :**  
 
 ---
 
@@ -795,7 +791,13 @@ Reprendre l'exercice de la partie [Trouver votre nom](#trouver-votre-nom-). Essa
 
 ---
 
-**Reponse :**  
+Pour cette tentative, nous n'avons obtenu aucun résultat pour offusquer le paquet.  
+Nous pensons que cela vient du fait qu'il est impossible de fragementer le paquet avant que celui-ci ne soit reçu par Snort. Comme la machine hôte contient Snort et frageroute les 2 programme reçoivent le paquet en même temps ce qui fait que frageroute n'a pas le temps de fragmenter le paquet avant que celui-ci n'arrive dans Snort.
+
+ L'alerte est donc toujours affichée.
+
+ Néanmoins, nous pensons que si cette manipulation avait fonctionée nous aurions du avoir 0 alerte lancée par le snort.  
+Cela venant du faite que comme le paquet contenant le nom est fragmenté le nom serait coupé en deux et dans deux paquets différents. Ce qui fait que snort ne détecterai pas le paquet.  
 
 ---
 
@@ -807,7 +809,13 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-**Reponse :**  
+Comme nous n'avons pas réussi à mettre en place fragroute nous n'avons pas pu tester le bon fonctionnement de frag3.  
+Pour mettre en place frag3 nous avons ajoutée dans le fichier `myrules.rules` les lignes suivantes :
+```
+preprocessor frag3_global
+preprocessor frag3_engine
+```
+Nous pensons que si frageroute était fonctionnel grâce a ses 2 règles nous aurions à nouveau l'alerte qui serait détecter car Snort détecter les pauqtes fragementer grâce à ces 2 lignes.
 
 ---
 
@@ -838,7 +846,16 @@ Ce module détecte et filtre les informations sur les PII (données à caractèr
 
 ---
 
-**Reponse :**  
+Pour conclure, nous avons trouvé ce laboratoire intéressant malgré quelques problèmes de mise en place.  
+Il était intéressant de voir la mise en pratique d'un IDS aini que de mettre en place des régles d'alerte et de logs.
+
+Les points que nous avons un peu moins apprécié sont le fait que nous avons, tout d'abord, rencontré un problème d'installation de Snort sur la machine Kali qui nous a bloqué pendant un moment.  
+Puis, nous avons eu à nouveau un problème avec la mise en place de frageroute.  
+Le problème était que la commande ne trouvait pas de route pour attendre l'adresse ip de la machine hôte.
+Nous avons longement cherché une réponse sur internet mais la commande fragroute semble avoir peu de documentation.  
+Nous aovns finalement trouvé une solution il fallait effectuer un ping vers la machine de destination pour ensuite pouvoir lancé frageroute et nous ne comprenons pas pourquoi cela règle le problème.
+
+Nous pensons que Snort est une application intéressante car sa mise en place est simple et il est facile de créer des règles.
 
 ---
 
