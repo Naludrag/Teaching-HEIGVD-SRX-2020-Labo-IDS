@@ -286,7 +286,7 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-Les proprocesseurs sont des plugins qui peuvent être utilisés afin d'examiner et de modifier des paquets avant l'engin de détection, l'IDS dans notre cas. Ceci permet de préparer les paquets afin qu'ils soient correctement interprétés par l'engin de détection.
+Les préprocesseurs sont des plugins qui peuvent être utilisés afin d'examiner et de modifier des paquets avant l'engin de détection, l'IDS dans notre cas. Ceci permet de préparer les paquets afin qu'ils soient correctement interprétés par l'engin de détection.
 
 Dans le cas de paquets chiffrés cela peut être intéressant. Nous pourrions déchiffrer le paquet avant de le transmettre à l'IDS par exemple.
 
@@ -761,7 +761,9 @@ Faire des recherches à propos des outils `fragroute` et `fragtest`.
 
 ---
 
-fragroute
+Ces deux outils sont utilisés modifier le traffic sortant dans le but d'évader la détection d'un NIDS. Ces outils sont uniquement capables de modifier le traffic sortant à destination d'un NIDS.
+
+D'autres outils, tel que fragrouter, permettent de travailler sur tout le traffic réseau en utilisant du forwarding.
 
 ---
 
@@ -770,7 +772,10 @@ fragroute
 
 ---
 
-**Reponse :**  
+Ces outils travaillent principalement en fragmentant les paquets. Ils sont ensuite capables de dupliquer, dropper, réordonner les segments.  
+Une autre technique abuse également le réassemblage de fragments (fragmentation overlap). Cela consiste à remplacer certains fragments par les plus récents ou les plus anciens lors du réassemblage.
+
+Ces différentes techniques peuvent être utilisées pour évader la détéction.
 
 ---
 
@@ -779,7 +784,6 @@ fragroute
 
 ---
 
-**Reponse :**  
 
 ---
 
