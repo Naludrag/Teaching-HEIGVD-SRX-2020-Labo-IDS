@@ -1,5 +1,7 @@
 # Teaching-HEIGVD-SRX-2020-Laboratoire-IDS
 
+Fichier modifié par : **Müller Robin et Teixeira Carvalho Stéphane**
+
 **Ce travail de laboratoire est à faire en équipes de 2 personnes** (oui... en remote...). Je vous laisse vous débrouiller ;-)
 
 **ATTENTION : Commencez par créer un Fork de ce repo et travaillez sur votre fork.**
@@ -288,9 +290,9 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 Les préprocesseurs sont des plugins qui peuvent être utilisés afin d'examiner et de modifier des paquets avant l'engin de détection, l'IDS dans notre cas. Ceci permet de préparer les paquets afin qu'ils soient correctement interprétés par l'engin de détection.
 
-Dans le cas de paquets chiffrés cela peut être intéressant. Nous pourrions déchiffrer le paquet avant de le transmettre à l'IDS par exemple.
+Dans le cas de paquets chiffrés cela pourrait être intéressant. Nous pourrions déchiffrer le paquet avant de le transmettre à l'IDS par exemple.
 
-Certains preprocesseurs permettent également d'examiner un paquet pour ainsi détecter les paquets qui pourrait tenter de bypass la détection de snort.
+Certains preprocesseurs permettent également d'examiner un paquet pour ainsi détecter les paquets qui pourrait tenter de bypass la détection de snort(ex. Frag3).
 
 ---
 
@@ -313,10 +315,13 @@ alert tcp any any -> any any (msg:"Mon nom!"; content:"Rubinstein"; sid:4000015;
 **Question 3: Qu'est-ce qu'elle fait la règle et comment ça fonctionne ?**
 
 ---
+Cette règle permet de lancer une alerte lorsqu'un paquet tcp aura dans son contenu le mot-clé "Rubinstein".
+
+Fonctionnement de la règle :
 
 Cette règle va prendre tout les paquets tcp venant de n'importe quelle IP de n'importe quel port vers(`->`) n'importe quelle IP et port(règle mono-directionnelle).
 
-Elle va lancer une alerte avec le message "mon nom!" (`msg:"Mon nom!";`) lorsque le paquet contient le mot-clé Rubinstein (`content:"Rubinstein";`). La règle a pour id unique 4000015 ce qui nous montre que c'est une règle rajouter par l'utilisateur qui dans sa version 1. Nous pouvons affirmer cela les 1'000'000 premières règles sont réserver aux règles de base de Snort.
+Elle va lancer une alerte avec le message "mon nom!" (`msg:"Mon nom!";`) lorsque le paquet contient le mot-clé Rubinstein (`content:"Rubinstein";`). La règle a pour id unique 4000015 ce qui nous montre que c'est une règle rajouter par l'utilisateur qui est dans sa version 1. Nous pouvons affirmer cela car les 1'000'000 premières règles sont réserver aux règles de base de Snort.
 
 ---
 
@@ -537,14 +542,14 @@ Verdicts:
 ===============================================================================
 Snort exiting
 ```
-Snort affiche un resumé de l'analyse lancé.
+Snort affiche un resumé de l'analyse lancée.
 
-Dans la première partie, il est possible de voir pendant combien de temps Snort c'est exécuté.
-Ensuite, les statistiques sur la mémoires utilisers par snort est affichés.
+Dans la première partie, il est possible de voir pendant combien de temps Snort s'est exécuté.
+Ensuite, les statistiques sur la mémoire utilisée par snort est affichées.
 
-Puis, on peut voir le nombre de paquet que nous avons reçu et ceux analyser par Snort. Nous avons juste après le nombre de paquet analysés par protocol(protocol: nombre de paquets) ainsi que des statistiques sur les actions.
+Puis, on peut voir le nombre de paquet que nous avons reçu et ceux analyser par Snort. Nous avons juste après la section qui indique le nombre de paquet analysés par protocol(protocol: nombre de paquets) ainsi que des statistiques sur les actions.
 
-La dernière partie nous renseigne sur les alertes et les logs dans notre cas on peut voir une alerte lancée lorsque nous avons visité le site.
+La dernière partie nous renseigne sur les alertes et les logs effectués par Snort dans notre cas on peut voir une alerte qui a étét lancée lorsque nous avons visité le site avec le mot-clé `Teixeira`.
 
 ---
 
@@ -557,7 +562,7 @@ Aller au répertoire /var/log/snort. Ouvrir le fichier `alert`. Vérifier qu'il 
 
 ![](./images/Question7.PNG)
 
-La première ligne affiche le sid et la révision puis le message configuré de la règle.  
+La première ligne affiche le sid et la révision puis le message configuré par la règle.  
 La seconde ligne contient la catégorie (`classType`) qui permet de grouper les règles afin de mieux les organiser.  
 La troisième ligne est composée de la date et l'heure. On voit ensuite l'ip et le port source, la direction et l'ip et le port de destination.
 Les lignes restantes contiennent des informations sur le paquet TCP ayant déclenché l'alerte.
@@ -600,7 +605,7 @@ Ecrire une règle qui alerte à chaque fois que votre système reçoit un ping d
 
 `alert icmp any any -> 192.168.0.150 any (itype: 8; msg:"ICMP Detected"; sid:4000016; rev:1;)`
 
-Une alerte est généré lorsqu'un paquet icmp à destination `192.168.0.150`(machine hôte) est détecté et que le itype vaut 8. Un itype de 8 correspond à une icmp-request.
+Une alerte est généré lorsqu'un paquet icmp à pour destination `192.168.0.150`(machine hôte) et que le itype vaut 8. Un itype de 8 correspond à une icmp-request.
 
 ---
 
@@ -611,7 +616,7 @@ Une alerte est généré lorsqu'un paquet icmp à destination `192.168.0.150`(ma
 
 Nous avons mis l'opérateur de direction `->` pour indiquer que nous voulons tout le trafic arrivant vers notre station.   
 
-Nous avons également indiquer le paramètre itype: 8  qui permet de spécifier que nous désirons alerter uniquement lors de echo request vers notre machine. Ainsi, si nous effectuons un ping depuis notre machine vers un autre système les echo reply que notre machine générera ne déclencheront pas d'alerte.
+Nous avons également indiquer le paramètre `itype: 8` qui permet de spécifier que nous désirons alerter uniquement lors de echo request vers notre machine. Ainsi, si nous effectuons un ping depuis notre machine vers un autre système les echo reply que notre machine générera ne déclencheront pas d'alerte.
 
 ---
 
@@ -692,7 +697,7 @@ Nous avons défini le mot-clé "SSH-" après avoir fais certaines recherches. Vo
 
 ![Paquet Wireshark ping](images/Question14.PNG)
 
-Nous avons alors remarqué que le paquet SSH- était le premier paquet du stream donc le premier paquet reçu lors d'une tentative d'établissement de connexion SSH.
+Nous avons alors remarqué que le paquet tcp avec pour contenu `SSH-...` était le premier paquet du stream donc le premier paquet reçu lors d'une tentative d'établissement de connexion SSH. Nous devons alors lancer une alerte dès que ce paquet avec ce contenu est reçu.
 
 ---
 
@@ -736,7 +741,7 @@ Utiliser l'option correcte de Snort pour analyser le fichier de capture Wireshar
 
 Le comportement reste identique sauf que à la place d'écouter le trafic il lit le fichier. Le fichier alert est modifié si des alertes sont détectées et le fichier de log snort est également créer après la lecture.
 
-La seul différence pourrait finir du fait que Snort s'arrête après la lecture du fichier alors que dans le mode temps réel nous devons le désactiver à la main
+La seule différence pourrait venir du fait que Snort s'arrête après la lecture du fichier alors que dans le mode temps réel nous devons le désactiver à la main
 
 ---
 
@@ -761,7 +766,7 @@ Faire des recherches à propos des outils `fragroute` et `fragtest`.
 
 ---
 
-Ces deux outils sont utilisés modifier le traffic sortant dans le but d'évader la détection d'un NIDS. Ces outils sont uniquement capables de modifier le traffic sortant à destination d'un NIDS.
+Ces deux outils sont utilisés pour modifier le traffic sortant dans le but d'évader la détection d'un NIDS. Ces outils sont uniquement capables de modifier le traffic sortant à destination d'un NIDS.
 
 D'autres outils, tel que fragrouter, permettent de travailler sur tout le traffic réseau en utilisant du forwarding.
 
@@ -773,7 +778,7 @@ D'autres outils, tel que fragrouter, permettent de travailler sur tout le traffi
 ---
 
 Ces outils travaillent principalement en fragmentant les paquets. Ils sont ensuite capables de dupliquer, dropper, réordonner les segments.  
-Une autre technique abuse également le réassemblage de fragments (fragmentation overlap). Cela consiste à remplacer certains fragments par les plus récents ou les plus anciens lors du réassemblage.
+Une autre technique utilise le réassemblage de fragments (fragmentation overlap). Cela consiste à remplacer certains fragments par les plus récents ou les plus anciens lors du réassemblage.
 
 Ces différentes techniques peuvent être utilisées pour évader la détection.
 
@@ -798,10 +803,7 @@ Reprendre l'exercice de la partie [Trouver votre nom](#trouver-votre-nom-). Essa
 
 ---
 
-Pour cette tentative, nous n'avons initialement obtenu aucun résultat pour offusquer le paquet.  
-Nous avons essayé plusieurs configuration de fragroute mais nous pensions que la règle `ip_frag 8` suffirait.  
-
-~Nous pensons que cela vient du fait qu'il est impossible de fragmenter le paquet avant que celui-ci ne soit reçu par Snort. Comme la machine hôte contient Snort et fragroute les 2 programme reçoivent le paquet en même temps ce qui fait que fragroute n'a pas le temps de fragmenter le paquet avant que celui-ci n'arrive dans Snort.~
+Pour cette tentative, nous n'avons initialement obtenu aucun résultat pour offusquer le paquet.
 
 Nous pensons que cela vient du fait qu'il est impossible de fragmenter la réponse du serveur web avec fragroute. Il est uniquement possible d'intéragir avec les paquets provenant de la machine locale vers le serveur web mais pas dans l'autre sens.  
 Une solution possible serait d'utiliser fragrouter afin d'intéragir sur tous les paquets.
@@ -835,9 +837,6 @@ Verdicts:
 ```
 
 L'alerte n'est donc plus affichée car le nom n'apparait pas dans un paquet unique.
-
-~Néanmoins, nous pensons que si cette manipulation avait fonctionnée nous aurions du avoir 0 alerte lancée par le snort.  
-Cela venant du faite que comme le paquet contenant le nom est fragmenté le nom serait coupé en deux et dans deux paquets différents. Ce qui fait que snort ne détecterai pas le paquet.  ~
 
 ---
 
@@ -932,9 +931,11 @@ Les points que nous avons un peu moins apprécié sont le fait que nous avons, t
 Puis, nous avons eu à nouveau un problème avec la mise en place de fragroute.  
 Le problème était que la commande ne trouvait pas de route pour attendre l'adresse ip de la machine hôte.
 Nous avons longement cherché une réponse sur internet mais la commande fragroute semble avoir peu de documentation.  
-Nous aovns finalement trouvé une solution il fallait effectuer un ping vers la machine de destination pour ensuite pouvoir lancé frageroute et nous ne comprenons pas pourquoi cela règle le problème.
+Nous avons finalement trouvé une solution il fallait effectuer un ping vers la machine de destination pour ensuite pouvoir lancé frageroute et nous ne comprenons pas pourquoi cela règle le problème.
 
-Nous pensons que Snort est une application intéressante car sa mise en place est simple et il est facile de créer des règles.
+Mais dans l'ensemble le labo s'est bien déroulé.
+
+Nous pensons que Snort est une application intéressante car sa mise en place est simple et il est facile de créer des règles. Ainsi, il serait simple pour une entreprise ou un privé de mettre en place son propre IDS.
 
 ---
 
