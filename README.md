@@ -791,7 +791,7 @@ Ces différentes techniques peuvent être utilisées pour évader la détection.
 
 Frag3 est un préprocesseur utilisé pour défragmenter les paquets au niveau IP. Ceci permet d'améliorer grandement l'analyse ainsi que d'empêcher certaines techniques d'évasions.
 
-Frag3 réassemble donc les paquets à sa manière afin d'éviter de ne pas dépendre de l'environnement (p.ex. OS).
+Frag3 réassemble donc les paquets à sa manière afin de ne pas dépendre de l'environnement (p.ex. OS).
 
 ---
 
@@ -803,7 +803,12 @@ Reprendre l'exercice de la partie [Trouver votre nom](#trouver-votre-nom-). Essa
 
 ---
 
+<<<<<<< HEAD
 Pour cette tentative, nous n'avons initialement obtenu aucun résultat pour offusquer le paquet.
+=======
+Pour cette tentative, nous n'avons initialement obtenu aucun résultat pour offusquer le paquet.  
+Nous avons essayé plusieurs configuration de fragroute mais nous pensions que la règle `ip_frag 8` suffirait.  
+>>>>>>> 3c9e5daf74f44f414f824761b0d00c605cb97201
 
 Nous pensons que cela vient du fait qu'il est impossible de fragmenter la réponse du serveur web avec fragroute. Il est uniquement possible d'intéragir avec les paquets provenant de la machine locale vers le serveur web mais pas dans l'autre sens.  
 Une solution possible serait d'utiliser fragrouter afin d'intéragir sur tous les paquets.
