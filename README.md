@@ -786,7 +786,7 @@ Ces différentes techniques peuvent être utilisées pour évader la détection.
 
 Frag3 est un préprocesseur utilisé pour défragmenter les paquets au niveau IP. Ceci permet d'améliorer grandement l'analyse ainsi que d'empêcher certaines techniques d'évasions.
 
-Frag3 réassemble donc les paquets à sa manière afin d'éviter de ne pas dépendre de l'environnement (p.ex. OS).
+Frag3 réassemble donc les paquets à sa manière afin de ne pas dépendre de l'environnement (p.ex. OS).
 
 ---
 
@@ -800,8 +800,6 @@ Reprendre l'exercice de la partie [Trouver votre nom](#trouver-votre-nom-). Essa
 
 Pour cette tentative, nous n'avons initialement obtenu aucun résultat pour offusquer le paquet.  
 Nous avons essayé plusieurs configuration de fragroute mais nous pensions que la règle `ip_frag 8` suffirait.  
-
-~Nous pensons que cela vient du fait qu'il est impossible de fragmenter le paquet avant que celui-ci ne soit reçu par Snort. Comme la machine hôte contient Snort et fragroute les 2 programme reçoivent le paquet en même temps ce qui fait que fragroute n'a pas le temps de fragmenter le paquet avant que celui-ci n'arrive dans Snort.~
 
 Nous pensons que cela vient du fait qu'il est impossible de fragmenter la réponse du serveur web avec fragroute. Il est uniquement possible d'intéragir avec les paquets provenant de la machine locale vers le serveur web mais pas dans l'autre sens.  
 Une solution possible serait d'utiliser fragrouter afin d'intéragir sur tous les paquets.
@@ -835,9 +833,6 @@ Verdicts:
 ```
 
 L'alerte n'est donc plus affichée car le nom n'apparait pas dans un paquet unique.
-
-~Néanmoins, nous pensons que si cette manipulation avait fonctionnée nous aurions du avoir 0 alerte lancée par le snort.  
-Cela venant du faite que comme le paquet contenant le nom est fragmenté le nom serait coupé en deux et dans deux paquets différents. Ce qui fait que snort ne détecterai pas le paquet.  ~
 
 ---
 
