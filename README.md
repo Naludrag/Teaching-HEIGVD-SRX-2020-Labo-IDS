@@ -286,7 +286,7 @@ Vous pouvez aussi utiliser des captures Wireshark ou des fichiers snort.log.xxxx
 
 ---
 
-Les proprocesseurs sont des plugins qui peuvent être utilisés afin d'examiner et de modifier des paquets avant l'engin de détection, l'IDS dans notre cas. Ceci permet de préparer les paquets afin qu'ils soient correctement interprétés par l'engin de détection.
+Les préprocesseurs sont des plugins qui peuvent être utilisés afin d'examiner et de modifier des paquets avant l'engin de détection, l'IDS dans notre cas. Ceci permet de préparer les paquets afin qu'ils soient correctement interprétés par l'engin de détection.
 
 Dans le cas de paquets chiffrés cela peut être intéressant. Nous pourrions déchiffrer le paquet avant de le transmettre à l'IDS par exemple.
 
@@ -761,7 +761,9 @@ Faire des recherches à propos des outils `fragroute` et `fragtest`.
 
 ---
 
-fragroute
+Ces deux outils sont utilisés modifier le traffic sortant dans le but d'évader la détection d'un NIDS. Ces outils sont uniquement capables de modifier le traffic sortant à destination d'un NIDS.
+
+D'autres outils, tel que fragrouter, permettent de travailler sur tout le traffic réseau en utilisant du forwarding.
 
 ---
 
@@ -770,7 +772,10 @@ fragroute
 
 ---
 
-**Reponse :**  
+Ces outils travaillent principalement en fragmentant les paquets. Ils sont ensuite capables de dupliquer, dropper, réordonner les segments.  
+Une autre technique abuse également le réassemblage de fragments (fragmentation overlap). Cela consiste à remplacer certains fragments par les plus récents ou les plus anciens lors du réassemblage.
+
+Ces différentes techniques peuvent être utilisées pour évader la détection.
 
 ---
 
@@ -779,7 +784,9 @@ fragroute
 
 ---
 
-**Reponse :**  
+Frag3 est un préprocesseur utilisé pour défragmenter les paquets au niveau IP. Ceci permet d'améliorer grandement l'analyse ainsi que d'empêcher certaines techniques d'évasions.
+
+Frag3 réassemble donc les paquets à sa manière afin d'éviter de ne pas dépendre de l'environnement (p.ex. OS).
 
 ---
 
@@ -791,13 +798,46 @@ Reprendre l'exercice de la partie [Trouver votre nom](#trouver-votre-nom-). Essa
 
 ---
 
-Pour cette tentative, nous n'avons obtenu aucun résultat pour offusquer le paquet.  
-Nous pensons que cela vient du fait qu'il est impossible de fragementer le paquet avant que celui-ci ne soit reçu par Snort. Comme la machine hôte contient Snort et frageroute les 2 programme reçoivent le paquet en même temps ce qui fait que frageroute n'a pas le temps de fragmenter le paquet avant que celui-ci n'arrive dans Snort.
+Pour cette tentative, nous n'avons initialement obtenu aucun résultat pour offusquer le paquet.  
+Nous avons essayé plusieurs configuration de fragroute mais nous pensions que la règle `ip_frag 8` suffirait.  
 
- L'alerte est donc toujours affichée.
+~Nous pensons que cela vient du fait qu'il est impossible de fragmenter le paquet avant que celui-ci ne soit reçu par Snort. Comme la machine hôte contient Snort et fragroute les 2 programme reçoivent le paquet en même temps ce qui fait que fragroute n'a pas le temps de fragmenter le paquet avant que celui-ci n'arrive dans Snort.~
 
- Néanmoins, nous pensons que si cette manipulation avait fonctionée nous aurions du avoir 0 alerte lancée par le snort.  
-Cela venant du faite que comme le paquet contenant le nom est fragmenté le nom serait coupé en deux et dans deux paquets différents. Ce qui fait que snort ne détecterai pas le paquet.  
+Nous pensons que cela vient du fait qu'il est impossible de fragmenter la réponse du serveur web avec fragroute. Il est uniquement possible d'intéragir avec les paquets provenant de la machine locale vers le serveur web mais pas dans l'autre sens.  
+Une solution possible serait d'utiliser fragrouter afin d'intéragir sur tous les paquets.
+
+Afin de quand même tester le fonctionnement, nous avons configuré un serveur web (sur une seconde VM) avec un fichier contenant `Nom nom est Teixeira` ainsi que l'outil fragroute.  
+Nous avons ensuite lancé `sudo fragroute -f frag.conf 192.168.199.102` afin de fragmenter les paquets à la destination de notre machine hôte.  
+Nous avons ensuite lancé snort ainsi que 5 fois la commande `wget` pour télécharger la page web.
+
+Le résultat est le suivant :
+```
+===============================================================================
+Action Stats:
+     Alerts:            0 (  0.000%)
+     Logged:            0 (  0.000%)
+     Passed:            0 (  0.000%)
+Limits:
+      Match:            0
+      Queue:            0
+        Log:            0
+      Event:            0
+      Alert:            0
+Verdicts:
+      Allow:          256 ( 99.225%)
+      Block:            0 (  0.000%)
+    Replace:            0 (  0.000%)
+  Whitelist:            0 (  0.000%)
+  Blacklist:            0 (  0.000%)
+     Ignore:            0 (  0.000%)
+      Retry:            0 (  0.000%)
+===============================================================================
+```
+
+L'alerte n'est donc plus affichée car le nom n'apparait pas dans un paquet unique.
+
+~Néanmoins, nous pensons que si cette manipulation avait fonctionnée nous aurions du avoir 0 alerte lancée par le snort.  
+Cela venant du faite que comme le paquet contenant le nom est fragmenté le nom serait coupé en deux et dans deux paquets différents. Ce qui fait que snort ne détecterai pas le paquet.  ~
 
 ---
 
@@ -809,13 +849,52 @@ Modifier le fichier `myrules.rules` pour que snort utiliser le `Frag3 Preprocess
 
 ---
 
-Comme nous n'avons pas réussi à mettre en place fragroute nous n'avons pas pu tester le bon fonctionnement de frag3.  
 Pour mettre en place frag3 nous avons ajoutée dans le fichier `myrules.rules` les lignes suivantes :
 ```
 preprocessor frag3_global
 preprocessor frag3_engine
 ```
-Nous pensons que si frageroute était fonctionnel grâce a ses 2 règles nous aurions à nouveau l'alerte qui serait détecter car Snort détecter les pauqtes fragementer grâce à ces 2 lignes.
+
+Nous avons ensuite suivi la même méthodologie et le résultat de snort est le suivant :
+```
+===============================================================================
+Action Stats:
+     Alerts:            5 (  2.101%)
+     Logged:            5 (  2.101%)
+     Passed:            0 (  0.000%)
+Limits:
+      Match:            0
+      Queue:            0
+        Log:            0
+      Event:            0
+      Alert:            0
+Verdicts:
+      Allow:          233 (100.000%)
+      Block:            0 (  0.000%)
+    Replace:            0 (  0.000%)
+  Whitelist:            0 (  0.000%)
+  Blacklist:            0 (  0.000%)
+     Ignore:            0 (  0.000%)
+      Retry:            0 (  0.000%)
+===============================================================================
+Frag3 statistics:
+        Total Fragments: 170
+      Frags Reassembled: 5
+               Discards: 0
+          Memory Faults: 0
+               Timeouts: 0
+               Overlaps: 0
+              Anomalies: 0
+                 Alerts: 0
+                  Drops: 0
+     FragTrackers Added: 5
+    FragTrackers Dumped: 5
+FragTrackers Auto Freed: 0
+    Frag Nodes Inserted: 170
+     Frag Nodes Deleted: 170
+===============================================================================
+```
+Frag3 a donc été capable de réassembler les 5 paquets et donc de retrouver le nom.
 
 ---
 
@@ -850,7 +929,7 @@ Pour conclure, nous avons trouvé ce laboratoire intéressant malgré quelques p
 Il était intéressant de voir la mise en pratique d'un IDS aini que de mettre en place des régles d'alerte et de logs.
 
 Les points que nous avons un peu moins apprécié sont le fait que nous avons, tout d'abord, rencontré un problème d'installation de Snort sur la machine Kali qui nous a bloqué pendant un moment.  
-Puis, nous avons eu à nouveau un problème avec la mise en place de frageroute.  
+Puis, nous avons eu à nouveau un problème avec la mise en place de fragroute.  
 Le problème était que la commande ne trouvait pas de route pour attendre l'adresse ip de la machine hôte.
 Nous avons longement cherché une réponse sur internet mais la commande fragroute semble avoir peu de documentation.  
 Nous aovns finalement trouvé une solution il fallait effectuer un ping vers la machine de destination pour ensuite pouvoir lancé frageroute et nous ne comprenons pas pourquoi cela règle le problème.
